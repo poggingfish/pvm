@@ -20,6 +20,13 @@ int pvmcall(int syscall_num){
     else if (syscall_num == 1){
         printf("%c",stack[sp--]);
     }
+    else if (syscall_num == 2){
+        int pos = stack[sp--];
+        while (memory[pos] != 0){
+            printf("%c",memory[pos]);
+            pos++;
+        }
+    }
 }
 int exec(long long int *prog){
     int x;
@@ -185,8 +192,8 @@ int main(int argc, char* argv[]){
         printf("Usage: ./pvm <File>\n");
         exit(1);
     }
-    printf("PVM: Allocating 128MB.\n");
-    memory = malloc(128*1024*1024);
+    printf("PVM: Allocating ~50KB.\n");
+    memory = malloc(1024*50);
     load(argv[1]);
     exec(prog_hold.prog);
     free(memory);
