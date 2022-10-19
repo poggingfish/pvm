@@ -7,7 +7,6 @@ The PVM Compiler Toolchain
 #include <stdlib.h>
 #include <string.h>
 #include "pvm.h"
-long long int* memory;
 int stack[1000];
 int sp = 0;
 int A = 0;
@@ -95,6 +94,9 @@ int exec(long long int *prog){
         case SYSCALL:
             pvmcall(prog[++i]);
             break;
+        case JMP:
+            i = labels[prog[++i]]-1;
+            break;
         default:
             printf("ERR: IDENT %d does not exist.\n", op);
             free(memory);
@@ -174,7 +176,14 @@ long long int* load(char * file){
         else if (!strcmp(op, "SYSCALL")){
             prog_hold.prog[ptr++] = SYSCALL;
             prog_hold.prog[ptr++] = atoi(args[1]);
-         }
+        }
+        else if (!strcmp(op, "lbl")){
+            labels[atoi(args[1])] = ptr;
+        }
+        else if (!strcmp(op, "JMP")){
+            prog_hold.prog[ptr++] = JMP;
+            prog_hold.prog[ptr++] = atoi(args[1]);
+        }
         else{
             printf("ERR: Unknown command: %s\n", op);
             exit(1);
