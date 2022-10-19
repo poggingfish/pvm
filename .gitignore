@@ -1,6 +1,6 @@
 *.out
 pvm
 .vscode
-src/ps/__pycache__/parsetab.cpython-39.pyc
-src/ps/parsetab.py
-src/ps/out.pvm
+__pycache__
+parsetab.py
+*.pvm
