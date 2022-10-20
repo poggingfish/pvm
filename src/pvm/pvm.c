@@ -7,11 +7,6 @@ The PVM Compiler Toolchain
 #include <stdlib.h>
 #include <string.h>
 #include "pvm.h"
-int stack[1000];
-int sp = 0;
-int A = 0;
-int B = 0;
-int C = 0;
 int pvmcall(int syscall_num){
     if (syscall_num == 0){
         printf("%d",stack[sp--]);
@@ -28,8 +23,10 @@ int pvmcall(int syscall_num){
     }
 }
 int exec(long long int *prog){
-    int x;
+    int t;
     int y;
+    int z;
+    int x;
     int ACC = 0;
     int i = 0;
     while(prog[i] != END){
@@ -95,7 +92,29 @@ int exec(long long int *prog){
             pvmcall(prog[++i]);
             break;
         case JMP:
-            i = labels[prog[++i]]-1;
+            ReturnStack[++RSP] = i; 
+            i = labels[stack[sp--]]-1;
+            break;
+        case SLBL:
+            y = stack[sp--];
+            x = stack[sp--];
+            labels[x] = i+y;
+            break;
+        case RET:
+            i = ReturnStack[RSP--];
+            break;
+        case JE:
+            ReturnStack[++RSP] = i;
+            x = stack[sp--];
+            y = stack[sp--];
+            t = stack[sp--];
+            z = stack[sp--];
+            if (t == z){
+                i = labels[y]-1;
+            }
+            else{
+                i = labels[x]-1;
+            }
             break;
         default:
             printf("ERR: IDENT %d does not exist.\n", op);
@@ -152,6 +171,9 @@ long long int* load(char * file){
         else if (!strcmp(op, "ADD")){
             prog_hold.prog[ptr++] = ADD;
         }
+        else if (!strcmp(op, "SUB")){
+            prog_hold.prog[ptr++] = SUB;
+        }
         else if (!strcmp(op, "POPA")){
             prog_hold.prog[ptr++] = POPA;
         }
@@ -180,9 +202,17 @@ long long int* load(char * file){
         else if (!strcmp(op, "lbl")){
             labels[atoi(args[1])] = ptr;
         }
+        else if (!strcmp(op, "SLBL")){
+            prog_hold.prog[ptr++] = SLBL;
+        }
         else if (!strcmp(op, "JMP")){
             prog_hold.prog[ptr++] = JMP;
-            prog_hold.prog[ptr++] = atoi(args[1]);
+        }
+        else if (!strcmp(op, "RET")){
+            prog_hold.prog[ptr++] = RET;
+        }
+        else if (!strcmp(op, "JE")){
+            prog_hold.prog[ptr++] = JE;
         }
         else{
             printf("ERR: Unknown command: %s\n", op);
