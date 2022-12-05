@@ -17,10 +17,11 @@ int pvmcall(int syscall_num){
     else if (syscall_num == 2){
         int pos = stack[sp--];
         while (memory[pos] != 0){
-            printf("%c",memory[pos]);
+            printf("%c",(char)memory[pos]);
             pos++;
         }
     }
+    return 0;
 }
 int exec(long long int *prog){
     int t;
@@ -123,6 +124,7 @@ int exec(long long int *prog){
         }
         i++;
     }
+    return 0;
 }
 long long int* load(char * file){
     int ptr = 0;
